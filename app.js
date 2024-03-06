@@ -52,4 +52,38 @@ app.post("/register", async (req,res) => {
         console.log(error);
     }
 })
+
+app.post("/login", async (req,res) => {
+    try{
+        const { email, password } = req.body;
+        if (!(email && password)) {
+            res.status(400).send("All input is required");
+        }
+        const user = await User.findOne({ email });
+
+        // Method - 1
+        // if (!user){console.log("You are not registered!!");}
+        
+        // if(bcrypt.campare(password,user.password)){
+        //     // generate the token and send it to the client
+        // }
+
+        // Method - 2
+        if (user && (await bcrypt.compare(password,user.password))){
+            const token = jwt.sign(
+                {user_id : user._id, email},
+                process.env.SECRET_KEY,
+                { expiresIn : "1h"}
+            )
+            user.token = token;
+            user.password = undefined;
+            res.status(200).json(user);
+        }
+        res.status(400).send("Invalid Credentials");
+    }
+    catch(error) {
+        console.log(error);
+    }
+})
+
 module.exports = app;
