@@ -6,9 +6,11 @@ const User = require('./models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require('./middleware/auth');
+const cookieParser = require("cookie-parser");
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser())
 
 
 app.get('/', (req, res) => {
@@ -78,7 +80,18 @@ app.post("/login", async (req,res) => {
             )
             user.token = token;
             user.password = undefined;
-            res.status(200).json(user);
+            // res.status(200).json(user);
+
+            //  if want to use cookies
+            const options = {
+                expires : new Date(Date.now() + 24*60*60*1000),
+                httpOnly : true
+            }
+            res.status(200).cookie('token', token, options).json({
+                success : true,
+                token : token,
+                user : user
+            });
         }
         res.status(400).send("Invalid Credentials");
     }
