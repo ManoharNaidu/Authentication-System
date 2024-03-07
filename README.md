@@ -1,0 +1,3 @@
+A backend development to register the user.
+Also to login the user,verifing at the backend if the user exitsts or not everything...
+And also integrated middleware to make sure that a particular website is accessible only when the user is logged in.
